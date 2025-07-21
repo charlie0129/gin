@@ -245,6 +245,29 @@ func TestRouteRedirectTrailingSlash(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, w.Code)
 }
 
+func TestRouteTrailingSlashInsensitivity(t *testing.T) {
+	router := New()
+	router.TrailingSlashInsensitivity = true
+	router.GET("/path", func(c *Context) { c.String(http.StatusOK, "path") })
+	router.GET("/path2/", func(c *Context) { c.String(http.StatusOK, "path2") })
+
+	w := PerformRequest(router, http.MethodGet, "/path/")
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "path", w.Body.String())
+
+	w = PerformRequest(router, http.MethodGet, "/path")
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "path", w.Body.String())
+
+	w = PerformRequest(router, http.MethodGet, "/path2/")
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "path2", w.Body.String())
+
+	w = PerformRequest(router, http.MethodGet, "/path2")
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "path2", w.Body.String())
+}
+
 func TestRouteRedirectFixedPath(t *testing.T) {
 	router := New()
 	router.RedirectFixedPath = true
