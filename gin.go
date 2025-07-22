@@ -650,6 +650,8 @@ func (engine *Engine) handleHTTPRequest(c *Context) {
 			if value.tsr && engine.TrailingSlashInsensitivity {
 				// Retry with the path with or without the trailing slash.
 				// It should succeed because tsr is true.
+				// Clear params to avoid re-parsing them.
+				*c.params = (*c.params)[:0]
 				value = root.getValue(addOrRemoveTrailingSlash(rPath), c.params, c.skippedNodes, unescape)
 				if value.handlers != nil {
 					c.handlers = value.handlers
